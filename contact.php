@@ -1,57 +1,49 @@
-<?php
-    use PHPMailer\PHPMailer\PHPMailer;
-    function sendmail(){
-        $name = "namakokkikik";  // Name of your website or yours
-        $to = "mkikik27@gmail.com";  // mail of reciever
-        $from = $_POST['email'];
-        $subject = $_POST['subject'];
-        $body = $_POST['message'];
-        $email = "kinnabusiness@gmail.com";
-        $password = "uiilmjlzhkdxllgx";  // your mail password
+b<?php
 
-        // Ignore from here
+//Import PHPMailer classes into the global namespace
+//These must be at the top of your script, not inside a function
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
-        require_once "PHPMailer/PHPMailer.php";
-        require_once "PHPMailer/SMTP.php";
-        require_once "PHPMailer/Exception.php";
-        $mail = new PHPMailer();
+//Load Composer's autoloader
+require 'vendor/autoload.php';
 
-        // To Here
-
-        //SMTP Settings
-        $mail->isSMTP();
-        // $mail->SMTPDebug = 3;  Keep It commented this is used for debugging                          
-        $mail->Host = "smtp.gmail.com"; // smtp address of your email
-        $mail->SMTPAuth = true;
-        $mail->Username = $email;
-        $mail->Password = $password;
-        $mail->Port = 587;  // port
-        $mail->SMTPSecure = "tls";  // tls or ssl
-        $mail->smtpConnect([
-        'ssl' => [
-            'verify_peer' => false,
-            'verify_peer_name' => false,
-            'allow_self_signed' => true
-            ]
-        ]);
-
-        //Email Settings
-        $mail->isHTML(true);
-        $mail->setFrom($from, $name);
-        $mail->addAddress($to); // enter email address whom you want to send
-        $mail->Subject = ("$subject");
-        $mail->Body = $body;
-        if ($mail->send()) {
-            echo "Email is sent!";
-        } else {
-            echo "Something is wrong: <br><br>" . $mail->ErrorInfo;
-        }
-    }
+//Create an instance; passing `true` enables exceptions
+$mail = new PHPMailer(true);
 
 
-        // sendmail();  // call this function when you want to
+$mailer = $_POST['email'];
+$mailer_name = $_POST['name'];
+$subject = $_POST['subject'];
+$message = $_POST['message'];
 
-        if (isset($_GET['submit'])) {
-            sendmail();
-        }
-?>
+
+try {
+    //Server settings
+    $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+    $mail->isSMTP();                                            //Send using SMTP
+    $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
+    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+    $mail->Username   = 'mkikik27@gmail.com';                     //SMTP username
+    $mail->Password   = 'qcyuheqroeourtaj';                               //SMTP password
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+    $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+    
+
+    //Recipients
+    $mail->setFrom($mailer, $mailer_name);
+    $mail->addAddress('mkikik27@gmail.com','Personal Profil');     //Add a recipient
+
+
+    //Content
+    $mail->isHTML(true);                                  //Set email format to HTML
+    $mail->Subject = $subject;
+    $mail->Body    = 'From : '.$mailer.'</br> Message :'.$message;
+
+    $mail->send();
+    echo 'Message has been sent';
+} catch (Exception $e) {
+    echo "Message could not be sent";
+}
